@@ -1,7 +1,7 @@
 <template>
     <div class="signin">
         <h2>Sign in</h2>
-        <input type="text" placeholder="Username" v-model="username">
+        <input type="text" placeholder="email" v-model="email">
         <input type="password" placeholder="Password" v-model="password">
         <button @click="signIn">Signin</button>
         <p>You don't have an account?
@@ -17,13 +17,14 @@ export default {
   name: 'Signin',
   data: function () {
     return {
-      username: '',
+      email: '',
       password: ''
     }
   },
   methods: {
     signIn: function () {
-      firebase.auth().signInWithEmailAndPassword(this.username, this.password).then(user => {
+      firebase.auth().signInWithEmailAndPassword(this.email, this.password).then(res => {
+        localStorage.setItem('jwt', res.user.qa)
         this.$router.push('/')
       }, err => {
         alert(err.message)
@@ -33,7 +34,6 @@ export default {
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 h1, h2 {
   font-weight: normal;
@@ -58,6 +58,10 @@ a {
   align-items: center
 }
 input {
+  margin: 10px 0;
+  padding: 10px;
+}
+button {
   margin: 10px 0;
   padding: 10px;
 }

@@ -1,13 +1,17 @@
 <template>
-  <div class="hello">
+  <div class='hello'>
     <h1>Hello {{ name }}!!</h1>
     <h1>{{ msg }}</h1>
     <h2>Essential Links</h2>
     <button @click="signOut">Sign out</button>
+    <button @click="apiPublic">public</button>
+    <button @click="apiPrivate">private</button>
   </div>
 </template>
 
 <script>
+
+import axios from 'axios'
 import firebase from 'firebase'
 
 export default {
@@ -24,19 +28,22 @@ export default {
         localStorage.removeItem('jwt')
         this.$router.push('/signin')
       })
+    },
+    apiPublic: async function () {
+      let res = await axios.get('http://localhost:8000/public')
+      this.msg = res.data
+    },
+    apiPrivate: async function () {
+      let res = await axios.get('http://localhost:8000/private', {
+        headers: {'Authorization': 'Bearer ' + localStorage.getItem('jwt')}
+      })
+      this.msg = res.data
     }
-  },
-  created: function () {
-    firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(idToken => {
-      localStorage.setItem('jwt', idToken);
-    }).catch(error => {
-      console.log(error)
-    })
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
+<!-- Add 'scoped' attribute to limit CSS to this component only -->
 <style scoped>
 h1, h2 {
   font-weight: normal;
@@ -51,5 +58,9 @@ li {
 }
 a {
   color: #42b983;
+}
+button {
+  margin: 10px 0;
+  padding: 10px;
 }
 </style>

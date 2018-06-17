@@ -7,20 +7,24 @@ import firebase from 'firebase'
 
 Vue.config.productionTip = false
 
+let app
 const config = {
-  apiKey: 'YOUR_KEY',
-  authDomain: 'YOUR_DOMAIN.firebaseapp.com',
-  databaseURL: 'YOUR_DOMAIN.firebaseio.com',
-  projectId: 'YOUR_ID',
-  storageBucket: 'YOUR_BUCKET_ID.appspot.com',
-  messagingSenderId: 'YOUR_SENDER_ID'
+  apiKey: 'AIzaSyBpMPTk-JMpR_KG-T8ElsoFvOajwEmBKE8',
+  authDomain: 'okra-205912.firebaseapp.com',
+  databaseURL: 'https://okra-205912.firebaseio.com',
+  projectId: 'okra-205912',
+  storageBucket: 'okra-205912.appspot.com',
+  messagingSenderId: '634081150354'
 }
 firebase.initializeApp(config)
-
-/* eslint-disable no-new */
-new Vue({
-  el: '#app',
-  router,
-  components: { App },
-  template: '<App/>'
+firebase.auth().onAuthStateChanged(user => {
+  /* eslint-disable no-new */
+  if (!app) {
+    new Vue({
+      el: '#app',
+      router,
+      components: { App },
+      template: '<App/>'
+    })
+  }
 })

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -20,36 +21,41 @@ func public(w http.ResponseWriter, r *http.Request) {
 }
 
 func private(w http.ResponseWriter, r *http.Request) {
-	opt := option.WithCredentialsFile(os.Getenv("CREDENTIALS"))
-	app, err := firebase.NewApp(context.Background(), nil, opt)
-	if err != nil {
-		panic(err)
-	}
-	auth, err := app.Auth(context.Background())
-	if err != nil {
-		panic(err)
-	}
-
-	authHeader := r.Header.Get("Authorization")
-	idToken := strings.Replace(authHeader, "Bearer ", "", 1)
-	print(idToken)
-	token, err := auth.VerifyIDToken(context.Background(), idToken)
-	if err != nil {
-		log.Fatalf("error verifying ID token: %v\n", err)
-	}
-
-	log.Printf("Verified ID token: %v\n", token)
 	w.Write([]byte("hello private!\n"))
+}
+
+func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		opt := option.WithCredentialsFile(os.Getenv("CREDENTIALS"))
+		app, err := firebase.NewApp(context.Background(), nil, opt)
+		if err != nil {
+			fmt.Printf("error: %v\n", err)
+		}
+		auth, err := app.Auth(context.Background())
+		if err != nil {
+			fmt.Printf("error: %v\n", err)
+		}
+
+		authHeader := r.Header.Get("Authorization")
+		idToken := strings.Replace(authHeader, "Bearer ", "", 1)
+		token, err := auth.VerifyIDToken(context.Background(), idToken)
+		if err != nil {
+			fmt.Printf("error verifying ID token: %v\n", err)
+		}
+		log.Printf("Verified ID token: %v\n", token)
+		next.ServeHTTP(w, r)
+	}
 }
 
 func main() {
 	port := os.Getenv("SERVER_PORT")
-	allowedOrigins := handlers.AllowedOrigins([]string{"*"})
+	allowedOrigins := handlers.AllowedOrigins([]string{"http://localhost:8080"})
 	allowedMethods := handlers.AllowedMethods([]string{"GET", "POST", "DELETE", "PUT"})
+	allowedHeaders := handlers.AllowedHeaders([]string{"Authorization"})
 
 	r := mux.NewRouter()
 	r.HandleFunc("/public", public)
-	r.HandleFunc("/private", private)
+	r.HandleFunc("/private", authMiddleware(private))
 
-	log.Fatal(http.ListenAndServe(":"+port, handlers.CORS(allowedOrigins, allowedMethods)(r)))
+	log.Fatal(http.ListenAndServe(":"+port, handlers.CORS(allowedOrigins, allowedMethods, allowedHeaders)(r)))
 }

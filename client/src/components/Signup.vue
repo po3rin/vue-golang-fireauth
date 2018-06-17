@@ -17,13 +17,13 @@ export default {
   name: 'Signup',
   data () {
     return {
-      username: '',
+      email: '',
       password: ''
     }
   },
   methods: {
     signUp: function () {
-      firebase.auth().createUserWithEmailAndPassword(this.username, this.password).then(user => {
+      firebase.auth().createUserWithEmailAndPassword(this.email, this.password).then(user => {
         console.log('Create account: ', user.email)
       }).catch(error => {
         console.log(error.message)
@@ -57,6 +57,10 @@ a {
   align-items: center
 }
 input {
+  margin: 10px 0;
+  padding: 10px;
+}
+button {
   margin: 10px 0;
   padding: 10px;
 }
