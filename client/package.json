@@ -16,6 +16,9 @@
   "dependencies": {
     "axios": "^0.18.0",
     "firebase": "^5.0.4",
+    "npm": "^6.1.0",
+    "to": "^0.2.9",
+    "update": "^0.7.4",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1"
   },
