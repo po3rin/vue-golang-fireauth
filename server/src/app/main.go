@@ -41,6 +41,8 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		token, err := auth.VerifyIDToken(context.Background(), idToken)
 		if err != nil {
 			fmt.Printf("error verifying ID token: %v\n", err)
+			w.Write([]byte("error verifying ID token\n"))
+			return
 		}
 		log.Printf("Verified ID token: %v\n", token)
 		next.ServeHTTP(w, r)
@@ -49,7 +51,7 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 
 func main() {
 	port := os.Getenv("SERVER_PORT")
-	allowedOrigins := handlers.AllowedOrigins([]string{"http://localhost:8080"})
+	allowedOrigins := handlers.AllowedOrigins([]string{"http://localhost:8081"})
 	allowedMethods := handlers.AllowedMethods([]string{"GET", "POST", "DELETE", "PUT"})
 	allowedHeaders := handlers.AllowedHeaders([]string{"Authorization"})
 
