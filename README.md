@@ -751,12 +751,12 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		app, err := firebase.NewApp(context.Background(), nil, opt)
 		if err != nil {
 			fmt.Printf("error: %v\n", err)
-            os.Exit(1)
+                        os.Exit(1)
 		}
 		auth, err := app.Auth(context.Background())
 		if err != nil {
 			fmt.Printf("error: %v\n", err)
-            os.Exit(1)
+                        os.Exit(1)
 		}
 
         // クライアントから送られてきた JWT 所得
