@@ -22,7 +22,7 @@ https://github.com/po3rin/vue-golang-fireauth
 
 <img src="https://qiita-image-store.s3.amazonaws.com/0/186028/f854d45f-ac35-8092-ef62-cff61b4bb3ea.png" width=20%>
 
-Vue.jsは現在、非常に人気のあるJavaScriptフレームワークです。GitHubでのstarはjQuery、Reactを抑え、現在最も注目されている技術です。導入のし易さや、軽量感、学習コストが少ないことを売りにしている。
+Vue.jsは現在、非常に人気のあるJavaScriptフレームワークです。GitHubでのstarはjQuery、Reactを抑え、現在最も注目されているJSフレームワークです。導入のし易さや、軽量感、学習コストが少ないことを売りにしている。
 
 Vue.jsの入門記事を前に作ったので、初めて触る人はこちらも参考にしてみてください。
 [VueCLIからVue.js入門①【VueCLIで出てくるファイルを概要図で理解】](https://qiita.com/po3rin/items/3968f825f3c86f9c4e21)
@@ -181,9 +181,13 @@ button {
 </style>
 ```
 
+下のようになります
+
+<img width="790" alt="スクリーンショット 2018-06-19 18.11.14.png" src="https://qiita-image-store.s3.amazonaws.com/0/186028/3818ad0b-732c-639d-df44-36035c75808e.png">
+
 今はAPIを叩くボタンを押しても、まだAPIサーバーを作ってないのでエラーが出るはずです。
 
-そして src/components/Signup.vue と src/Signin.vue を作成します。
+そして src/components/Signup.vue と src/components/Signin.vue を作成します。
 まずは src/components/Signup.vue から
 
 ```vue
@@ -193,6 +197,7 @@ button {
     <h2>Sign up</h2>
     <input type="text" placeholder="Username" v-model="email">
     <input type="password" placeholder="Password" v-model="password">
+    <button>Register</button>
     <p>Do you have an account?
       <router-link to="/signin">sign in now!!</router-link>
     </p>
@@ -244,7 +249,12 @@ button {
 </style>
 ```
 
-まだサインアップはできません。後程つけていきます。次は src/Signin.vue です。
+下のようになっているはず。signInページへ遷移するリンクはつけていないので　'localhost:8080/#/signup'　のようにURLで直接みてみましょう。
+
+<img width="739" alt="スクリーンショット 2018-06-19 18.05.05.png" src="https://qiita-image-store.s3.amazonaws.com/0/186028/02b9adc9-ce96-0cbb-f488-f6f8caf4a5c0.png">
+
+
+まだサインアップはできません。後程つけていきます。次は src/components/Signin.vue です。
 
 ```vue
 
@@ -253,6 +263,7 @@ button {
         <h2>Sign in</h2>
         <input type="text" placeholder="email" v-model="email">
         <input type="password" placeholder="Password" v-model="password">
+        <button>Signin</button>
         <p>You don't have an account?
             <router-link to="/signup">create account now!!</router-link>
         </p>
@@ -303,6 +314,10 @@ button {
 }
 </style>
 ```
+
+そしてこうなります。'localhost:8080/#/signin'　のようにURLで直接みてみましょう。
+
+<img width="792" alt="スクリーンショット 2018-06-19 18.04.40.png" src="https://qiita-image-store.s3.amazonaws.com/0/186028/14c833c8-acca-f485-23c8-decbf2c3c6a4.png">
 
 実際に動くサインイン機能は後程実装します。
 
@@ -468,7 +483,7 @@ firebase.initializeApp(config)
 
 ### サインアップ機能
 
-早速 Signup 機能をつけていきましょう。Signup.vue を書き換えます。
+早速 Signup 機能をつけていきましょう。Signup.vue を書き換えます。buttonタグにイベントと、SignUpメソッドを追加しています。
 
 ```vue
 
@@ -513,7 +528,7 @@ export default {
 
 ### サインイン機能
 
-先ほどサインアップしたアカウントでログインできるようにします。Signin.vue を書き換えます。signInメソッドを追加し、そのメソッドを呼び出すボタンをつけただけです。
+先ほどサインアップしたアカウントでログインできるようにします。Signin.vue を書き換えます。buttonタグにイベントと、signInメソッドを追加します。
 
 ```vue
 
@@ -656,15 +671,15 @@ export default router
 ```
 
 大事なのは '/' のみに設定した meta: { requiresAuth: true } です。これで、このrouteに認証が必要かを判断します。
-firebase.auth().currentUser で現在ログインしているユーザーを返します。これでログインしていない場合は、/login にリダイレクトされるようになりました。
+firebase.auth().currentUser で現在ログインしているユーザーを返します。これでログインしていない場合は、/signin にリダイレクトされるようになりました。
 
 ### Vue.jsのライフサイクルに合うようにFirebaseを初期化する
 
-Vue.jsでFirebase Authentication を使う際の最大のポイントはここになると思います。ここまでの実装ではログインした後でも、ブラウザを更新したら /login　にリダイレクトされてしまいます。
+Vue.jsでFirebase Authentication を使う際の最大のポイントはここになると思います。ここまでの実装ではログインした後でも、ブラウザを更新したら /signin　にリダイレクトされてしまいます。
 
 理由としては、先ほど実装した beforeEach が Firebase が初期化される前に実行されるので、アプリケーションの最初のロード時に　firebase.auth().currentUser が null を返してしまう為です。
 
-これを回避するために onAuthStateChanged を使います。これはユーザーの認証状況が変更されたら実行されるオブザーバーです。これでVueインスタンス作成のコードを包むことで、Firebase の初期化後に Vueインスタンスが作成されるようになります。src/main.js を編集しましょう！
+これを回避するために onAuthStateChanged を使います。これはユーザーの認証状況が変更されたら実行されるオブザーバーです。現在のユーザを取得したときにAuthオブジェクトが初期化などの中間状態にならないようにすることができます。これでVueインスタンス作成のコードを包むことで、Firebase の初期化後に Vueインスタンスが作成されるようになります。src/main.js を編集しましょう！
 
 ```js
 // ...
@@ -736,20 +751,25 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		app, err := firebase.NewApp(context.Background(), nil, opt)
 		if err != nil {
 			fmt.Printf("error: %v\n", err)
+            os.Exit(1)
 		}
 		auth, err := app.Auth(context.Background())
 		if err != nil {
 			fmt.Printf("error: %v\n", err)
+            os.Exit(1)
 		}
 
         // クライアントから送られてきた JWT 所得
 		authHeader := r.Header.Get("Authorization")
-        idToken := strings.Replace(authHeader, "Bearer ", "", 1)
+                idToken := strings.Replace(authHeader, "Bearer ", "", 1)
 
-        // JWT の検証
+                // JWT の検証
 		token, err := auth.VerifyIDToken(context.Background(), idToken)
 		if err != nil {
-			fmt.Printf("error verifying ID token: %v\n", err)
+                        // JWT が無効なら Handler に進まず別処理
+                        fmt.Printf("error verifying ID token: %v\n", err)
+                        w.Write([]byte("error verifying ID token\n"))
+                        return
 		}
 		log.Printf("Verified ID token: %v\n", token)
 		next.ServeHTTP(w, r)
@@ -759,7 +779,8 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 // ...
 
 ```
-verifyIDToken()で JWT の検証を Firebase で行なっています。これでミドルウェアは完成です。こいつでprivateハンドラーをラップします。
+
+verifyIDToken()で JWT の検証を Firebase で行なっています。エラーハンドリング等は分かりやすさの為に簡易化していますが、これでミドルウェアは完成です。こいつでprivateハンドラーをラップします。
 
 ```go
 func main() {
@@ -781,10 +802,10 @@ $ curl localhost:8080/public
 hello public!
 
 $ curl localhost:8080/privte
-error verifying ID token: 
+error verifying ID token
 ```
 
-JWT をサーバーに送ってないので /private だけデータが返ってきませんでした。Vue.js側で JWT をHeaderに入れてHTTPリクエストするメソッドを実装しましょう。HelloWorld.vue の apipPrivate関数を編集します。
+JWT をサーバーに送ってないので /private だけ求めていた'hello private!'が返ってきませんでした。Vue.js側で JWT をHeaderに入れてHTTPリクエストするメソッドを実装しましょう。HelloWorld.vue の apiPrivate関数を編集します。
 
 ```js
 // ...
