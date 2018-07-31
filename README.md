@@ -574,7 +574,7 @@ export default {
 
 ### サインアウト機能
 
-サインアウト機能も簡単です。firebase.auth().signOut()を実行するだけです。この時に /signin にリダイレクトするようにしておきます。また、JWTもローカルストレージから削除します。また、せっかくのマイページなので、ユーザーのメアドを表示するようにしておきましょう。firebase.auth().currentUser.email で所得できます。
+サインアウト機能も簡単です。firebase.auth().signOut()を実行するだけです。この時に /signin にリダイレクトするようにしておきます。また、JWTもローカルストレージから削除します。また、せっかくのマイページなので、ユーザーのメアドを表示するようにしておきましょう。firebase.auth().currentUser.email で取得できます。
 
 ```html
 <template>
@@ -719,7 +719,7 @@ $ go get -u google.golang.org/api/option
 ```
 
 サービスアカウントの認証情報が含まれる JSON ファイル をGo言語で読み込んでFirebaseのセットアップが完了します！
-このJSONファイルは Firebase Console または Google Cloud Consoleで所得可能です。僕は Cloud Platform Console で所得しました。
+このJSONファイルは Firebase Console または Google Cloud Consoleで取得可能です。僕は Cloud Platform Console で取得しました。
 
 【Firebase Consoleの場合】
 - プロジェクトの設定ページの [サービス アカウント] タブに移動し、[サービス アカウント] タブの [Firebase Admin SDK] セクション下部にある [新しい秘密鍵を生成] ボタンをクリックします。
@@ -759,7 +759,7 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
                         os.Exit(1)
 		}
 
-        // クライアントから送られてきた JWT 所得
+        // クライアントから送られてきた JWT 取得
 		authHeader := r.Header.Get("Authorization")
                 idToken := strings.Replace(authHeader, "Bearer ", "", 1)
 
