@@ -1,3 +1,8 @@
+# vue-golang-fireauth
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/po3rin/vue-golang-fireauth)](https://goreportcard.com/report/github.com/po3rin/vue-golang-fireauth)
+
+# Introduction
 
 <img width="855" alt="スクリーンショット 2018-06-18 17.52.34.png" src="https://qiita-image-store.s3.amazonaws.com/0/186028/47db3a74-6c0c-1c50-682b-f7d6b2158ba9.png">
 
