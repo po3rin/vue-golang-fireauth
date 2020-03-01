@@ -422,8 +422,8 @@ main関数の中を編集します。私はlocalhost:8080を設定していま�
 ```go
 // ...
 import (
-  // ...
-  "github.com/gorilla/handlers"
+	// ...
+	"github.com/gorilla/handlers"
 )
 
 // ...
@@ -738,43 +738,42 @@ https://firebase.google.com/docs/admin/setup?authuser=0
 ### JWT を Go言語 + Firebase で検証
 
 JWTを検証するミドルウェアを作成します。このミドルウェアでハンドラーをラップしてあげれば、ラップした全てのAPIに検証機能がつきます。
-先ほど作成した鍵ファイルへのパスは環境変数で読み込み、下記のコードでセットアップします。Go言語での環境変数は os.Getenv("環境変数名") で読み込めます。
+先ほど作成した鍵ファイルへのパスは環境変数で読み込み、下記のコードでセットアップします。Go言語での環境変数は os.Getenv("環境変数名") で読み込めます。
 
 ```go
-
 import (
-    // ...
+	// ...
 
-    firebase "firebase.google.com/go"
-    "google.golang.org/api/option"
+	firebase "firebase.google.com/go"
+	"google.golang.org/api/option"
 )
 
 func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-        // Firebase SDK のセットアップ
+		// Firebase SDK のセットアップ
 		opt := option.WithCredentialsFile(os.Getenv("CREDENTIALS"))
 		app, err := firebase.NewApp(context.Background(), nil, opt)
 		if err != nil {
 			fmt.Printf("error: %v\n", err)
-                        os.Exit(1)
+			os.Exit(1)
 		}
 		auth, err := app.Auth(context.Background())
 		if err != nil {
 			fmt.Printf("error: %v\n", err)
-                        os.Exit(1)
+			os.Exit(1)
 		}
 
-        // クライアントから送られてきた JWT 取得
+		// クライアントから送られてきた JWT 取得
 		authHeader := r.Header.Get("Authorization")
-                idToken := strings.Replace(authHeader, "Bearer ", "", 1)
+		idToken := strings.Replace(authHeader, "Bearer ", "", 1)
 
-                // JWT の検証
+		// JWT の検証
 		token, err := auth.VerifyIDToken(context.Background(), idToken)
 		if err != nil {
-                        // JWT が無効なら Handler に進まず別処理
-                        fmt.Printf("error verifying ID token: %v\n", err)
-                        w.Write([]byte("error verifying ID token\n"))
-                        return
+			// JWT が無効なら Handler に進まず別処理
+			fmt.Printf("error verifying ID token: %v\n", err)
+			w.Write([]byte("error verifying ID token\n"))
+			return
 		}
 		log.Printf("Verified ID token: %v\n", token)
 		next.ServeHTTP(w, r)
@@ -782,7 +781,6 @@ func authMiddleware(next http.HandlerFunc) http.HandlerFunc {
 }
 
 // ...
-
 ```
 
 verifyIDToken()で JWT の検証を Firebase で行なっています。エラーハンドリング等は分かりやすさの為に簡易化していますが、これでミドルウェアは完成です。こいつでprivateハンドラーをラップします。
@@ -833,8 +831,8 @@ Vue.js + Go言語 + Firebase を使って簡単に認証付きWEBアプリケー
 
 ## 参考記事
 
-[Firebase Authentication 日本語ドキュメント](https://firebase.google.com/docs/auth/?hl=ja)
-[Vue 2 + Firebase: How to build a Vue app with Firebase authentication system in 15 minutes](https://medium.com/@anas.mammeri/vue-2-firebase-how-to-build-a-vue-app-with-firebase-authentication-system-in-15-minutes-fdce6f289c3c)
-[Vue.js + Firebase を使って爆速でユーザ認証を実装する](https://qiita.com/sin_tanaka/items/ea149a33bd9e4b388241)
-[遂にFirebase Admin SDK Goが登場！](https://qiita.com/koki_cheese/items/2d111b2b074bfa697776)
-[Goで始めるMiddleware](https://qiita.com/tnakata/items/ea962f1cdad21c2f68aa)
+- [Firebase Authentication 日本語ドキュメント](https://firebase.google.com/docs/auth/?hl=ja)
+- [Vue 2 + Firebase: How to build a Vue app with Firebase authentication system in 15 minutes](https://medium.com/@anas.mammeri/vue-2-firebase-how-to-build-a-vue-app-with-firebase-authentication-system-in-15-minutes-fdce6f289c3c)
+- [Vue.js + Firebase を使って爆速でユーザ認証を実装する](https://qiita.com/sin_tanaka/items/ea149a33bd9e4b388241)
+- [遂にFirebase Admin SDK Goが登場！](https://qiita.com/koki_cheese/items/2d111b2b074bfa697776)
+- [Goで始めるMiddleware](https://qiita.com/tnakata/items/ea962f1cdad21c2f68aa)
